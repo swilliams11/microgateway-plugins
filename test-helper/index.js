@@ -10,10 +10,10 @@ var _ = require('lodash');
 var debug = require('debug')('gateway:test');
 var http = require('http');
 var url = require('url');
-
-var chai = require('chai');
-chai.config.includeStack = true;
-chai.config.showDiff = true;
+var cmd = require('node-cmd');
+//var chai = require('chai');
+//chai.config.includeStack = true;
+//chai.config.showDiff = true;
 
 process.setMaxListeners(20); // avoid warning: possible EventEmitter memory leak detected.
 
@@ -25,7 +25,8 @@ module.exports.config = function() {
 
 // replace Apigee Volos implementations with Memory versions
 var replaceVolosApigeeWithMemory = function(gateway, impl) {
-  var base = path.join(process.cwd(), impl, 'node_modules');
+  //var base = path.join(process.cwd(), impl, 'node_modules');
+  var base = path.join(process.cwd(), 'node_modules');
   var apigee = require(path.join(base, 'volos-' + impl + '-apigee'));
   var memory = require(path.join(base, 'volos-' + impl + '-memory'));
   Object.keys(apigee).forEach(function(key) {
@@ -68,7 +69,6 @@ module.exports.startServersWithTarget = function startServersWithTarget(config, 
 };
 
 module.exports.startServers = function startServers(config, cb) {
-
   async.map(config.proxies, function(proxy, cb) {
 
     var target = http.createServer(function(req, res) {
@@ -118,35 +118,49 @@ module.exports.startServers = function startServers(config, cb) {
 };
 
 function startGateway(config, targets, cb) {
-  var gateway = require('../../gateway/lib/gateway');
-  replaceVolosApigeeWithMemory(gateway, 'analytics');
+  //determine where node_modules is located on the machine.
+  cmd.get(
+        'npm root -g',
+        function(err, data, stderr){
+          if(err){
+            console.log(err);
+            process.exit(1);
+          }
 
-  config.edgemicro.port = 0; // to let gateway start on a port of its choosing
+          var gateway = require( data.trim() + "/edgemicro/lib/gateway")(config.edgemicro.plugins.dir,config);
+          replaceVolosApigeeWithMemory(gateway, 'analytics');
 
-  gateway.start(config, function(err, server) {
-    if (err) { return cb(err); }
+          config.edgemicro.port = 0; // to let gateway start on a port of its choosing
 
-    config.edgemicro.port = server.address().port; // save the gateway's listening port
+          var callback = function(err, server) {
+            if (err) { return cb(err); }
 
-    if (config.edgemicro.plugins.sequence) {
-      config.edgemicro.plugins.sequence.forEach(function(plugin) {
-        exposeTestProbes(gateway, plugin);
-      });
-    }
+            config.edgemicro.port = server.address().port; // save the gateway's listening port
 
-    var response = {
-      gateway: gateway,
-      proxy: server,
-      targets: targets,
-      close: function close() {
-        gateway.stop();
-        server.close();
-        targets.forEach(function(target) {
-          target.close();
-        });
-      }
-    };
+            if (config.edgemicro.plugins.sequence) {
+              config.edgemicro.plugins.sequence.forEach(function(plugin) {
+                exposeTestProbes(gateway, plugin);
+              });
+            }
 
-    cb(null, response);
-  });
+            var response = {
+              gateway: gateway,
+              proxy: server,
+              targets: targets,
+              close: function close() {
+                gateway.stop();
+                server.close();
+                targets.forEach(function(target) {
+                  target.close();
+                });
+                process.exit(0); //added to stop the process after the test completes.
+              }
+            };
+
+            cb(null, response);
+          };
+          gateway.start(callback);
+
+        }
+    );
 }
