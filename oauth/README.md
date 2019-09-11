@@ -22,7 +22,7 @@ This plugin also allows you to change the default behavior above by setting one 
 
 ## Process Summary
 
-1. The client will obtain an client ID and secret.
+1. The client will obtain a client ID and secret.
 2. The client will include either the API Key on the request or exchange the client ID and secret for a JWT and include it the request to the Microgateway.
 3. The `oauth` plugin will validate either the API Key or the JWT.
 4. If the API Key or JWT is valid, then the request will continue to the next plugin, otherwise an error message will be returned to the client application.
@@ -43,15 +43,15 @@ The following properties can be set in the `oauth` stanza in the Microgateway co
 ```yaml
 oauth:
   # header name used to send the JWT to the Microgateway
-  authorization-header: "x-custom-auth-header" # defaults to Authorization
+  authorization-header: "x-custom-auth-header" # defaults to Authorization: Bearer
   # header name used to send the API Key to the Microgateway
   api-key-header: "x-custom-header" # defaults to x-api-key
   # set to true if you want to send the Authorization header to the target server; set to false when you want this plugin to remove the header after it is validated.
   keep-authorization-header: true # defaults to false
-  # set to true if you want to enable the Microgateway to cache the API Key with JWT.
+  # set to true if you want to enable the Microgateway to cache the JWT that is received when the API Key is validated.
   cacheKey: true # defaults to false, which validates the API key with Apigee Edge on each request
   # number of seconds before the token is removed from the cache.
-  # if you set this to 5 (seconds) then MG will check of the difference between the expiry time and the current time [abs(expiry time - current time)] is less than or equal (<=) to the grace period.  If true, then MG will remove the token from the cache.  
+  # if you set this to 5 (seconds) then the Microgateway will check if the difference between the expiry time and the current time [abs(expiry time - current time)] is less than or equal (<=) to the grace period.  If true, then the Microgateway will remove the token from the cache.  
   gracePeriod: 5 # defaults to 0 seconds
   ## Do not set allowOAuthOnly and allowAPIKeyOnly both to true. Only one of them should be set true.
   # set to true if you want to allow OAuth 2.0 only.  This will disable API Key validation.
@@ -62,7 +62,7 @@ oauth:
   productOnly: true # defaults to false, which enables the Microgateway to check if the proxy name is included in the product.
 
   ## Note that if you set the tokenCacheSize, then you should also enable it (tokenCache: true)
-  # set tokenCache to true if you want to cache the access token (JWT) locally
+  # set tokenCache to true if you want to cache the access token (JWT) that is received after the API key is validated.
   tokenCache: true # defaults to false, which does not cache the access token.
   # set the number of tokens allowed to be cached locally
   tokenCacheSize: 150 # defaults to 100
@@ -79,7 +79,7 @@ plugins:
 ```
 
 ## Configure the plugin
-In the same configuration file you also need to configure the `oauth` plugin if you want to change the default behavior.  The example below changes the `oauth` plugin to allow OAuth 2.0 access tokens only (JWTs), enables access token caching and changes the `tokenCacheSize` to 150 tokens.    
+In the same configuration file you also need to configure the `oauth` plugin if you want to change the default behavior.  The example below changes the `oauth` plugin to allow OAuth 2.0 access tokens (JWTs) only, enables access token caching and changes the `tokenCacheSize` to 150 tokens.    
 
 ```yaml
 auth:
@@ -89,14 +89,14 @@ auth:
 ```
 
 ## API Key Validation
-The Microgateway exchanges the API Key for a JWT when it submits the API key to Apigee Edge to be validated.   
+The Microgateway exchanges the API Key for a JWT when it validates the API key with Apigee Edge.   
 
 ## Caching
 ### API Keys
-If you set `cacheKey` to `true`, then the Microgateway will cache the JWT token that it receives in exchange for the API Key.  This prevents the Microgateway from sending a request to Apigee Edge to validate an access token on every request.
+If you set `cacheKey` to `true`, then the Microgateway will cache the JWT token that it receives in exchange for the API Key.  This prevents the Microgateway from sending a request to Apigee Edge to validate the API Key on every request.
 
 ### Cache Headers
-The Microgateway observes the [`cache-control`](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching) header, but only if you set it as `cache-control: no-cache`.  If you send this header in the request, then the JWTs that are received when you validate an API key will **not** be cached in the Microgateway provided that the `cacheKey` property is set to `false` in the Microgateway configuration file.  This plugin does not allow you to set the cache expiry time in the `cache-control` header. 
+The Microgateway observes the [`cache-control`](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching) header, but in a limited fashion.  If a client application wants to cache the JWT that is received after the API Key is validated, then it should set the `cache-control` header to any value except `no-cache`.  If you send this header in the request (`cache-control: max-age=120`), then the JWTs will be cached in the Microgateway even if the `cacheKey` is set to `false`.  If you set `cacheKey` to `true` and you send a request to the Microgateway with `cache-control: no-cache`, the JWT **will** be cached anyway.  Client applications are not allowed to override the `cacheKey` setting with the `cache-control` header.  This plugin does not allow you to set the cache expiry time in the `cache-control` header; it uses the expiry time in the JWT to determine the TTL of the cache.  
 
 ### Access Tokens
 Access tokens (JWTs) can also be cached in the Microgateway to avoid validating the JWT on every request.  Access tokens are only cached if you set `tokenCache` to `true` and the JWT is valid.  
@@ -104,6 +104,8 @@ Access tokens (JWTs) can also be cached in the Microgateway to avoid validating 
 ## Best Practices for configuring this plugin
 * The oauth plugin is typically listed first in the plugin sequence.  
 * Most customers only want to allow either API Key validation or access token validation, but not both at the same time.
+* Do not set `allowOAuthOnly` and `allowAPIKeyOnly` both to true. Only one of them should be set true.
+* Consider using the `oauthv2` or `apikeys` plugins instead of this plugin.  
 * If you need one set of APIs to be validated by JWTs and another set to be validated by API Keys (lower security), then consider the following:
   * create two products, one for API Key validation and one set for access token (JWT) validation, then configure two sets for Microgateway instances - one set for API key validation and one set for access token validation.
   * routing between these Microgateway instances should be handled with a HTTPS load balancer.  
