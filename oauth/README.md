@@ -82,7 +82,7 @@ plugins:
 In the same configuration file you also need to configure the `oauth` plugin if you want to change the default behavior.  The example below changes the `oauth` plugin to allow OAuth 2.0 access tokens (JWTs) only, enables access token caching and changes the `tokenCacheSize` to 150 tokens.    
 
 ```yaml
-auth:
+oauth:
   allowOAuthOnly: true
   tokenCache: true
   tokenCacheSize: 150
