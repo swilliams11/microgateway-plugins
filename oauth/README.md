@@ -126,6 +126,9 @@ oauth:
   tokenCacheSize: 150
 ```
 
+## API key validation
+
+Edge Microgateway exchanges the API Key for a JWT when it validates the API key with Apigee Edge.
 
 ## Caching
 
