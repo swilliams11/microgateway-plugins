@@ -1,7 +1,9 @@
 # oauth plugin
 
 ## Summary
-The OAuth plugin allows customers to secure API requests to Apigee Edge Microgateway with both API Key and OAuth 2.0 (JWT validation). Note that, buy default, when you include this plugin in the plugins sequence, you can use both API Key validation and OAuth 2.0 validation on API requests. However, you can change the default behavior to allow either API key validation **or** OAuth 2.0 (JWT) validation. 
+The OAuth plugin allows you to secure API requests to Apigee Edge Microgateway with both API Key and OAuth 2.0 (JWT validation). Note that, buy default, when you include this plugin in the plugins sequence, you can use both API Key validation and OAuth 2.0 validation on API requests. However, you can change the default behavior to allow either API key validation **or** OAuth 2.0 (JWT) validation. 
+
+can set flags Typically, this is not what customers want; instead they prefer either API Key validation **or** OAuth 2.0 (JWT validation) but not both.  
 
 ## OAuth plugin links
 Please review the following OAuth plugin documentation.  
