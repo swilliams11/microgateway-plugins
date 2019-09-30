@@ -1,40 +1,50 @@
 {
   "name": "microgateway-plugins",
-  "version": "2.3.30-beta",
+  "version": "3.0.9",
   "description": "Plugins for Apige Edge Microgateway",
+  "license": "Apache-2.0",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha -R spec"
+    "lint": "eslint .",
+    "test": "nyc ./node_modules/.bin/mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apigee/microgateway-plugins.git"
   },
   "dependencies": {
     "async": "^1.4.2",
     "debug": "^3.1.0",
+    "dotenv": "^8.0.0",
     "eureka-js-client": "^4.3.0",
     "js2xmlparser": "^2.0.2",
     "jsrsasign": "^7.2.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.15",
     "lynx": "^0.2.0",
-    "memored": "^1.1.1",
     "minimatch": "^3.0.4",
     "portastic": "^1.0.1",
     "request": "^2.87.0",
     "toobusy-js": "^0.5.1",
     "volos-analytics-apigee": "^0.4.0",
     "volos-cache-memory": "^0.10.0",
-    "volos-quota-apigee": "^0.13.0",
+    "volos-quota-apigee": "^0.13.4",
+    "volos-quota-common": "^0.11.8",
     "volos-quota-memory": "^0.11.0",
     "volos-spikearrest-memory": "^0.10.0",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
-    "js-yaml": "^3.4.2",
     "chai": "^2.3.0",
     "config": "^1.13.0",
-    "mocha": "^5.2.0",
-    "supertest": "^3.1.0",
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0",
+    "js-yaml": "^3.4.2",
+    "jshint-stylish": "^2.2.1",
     "jsonwebtoken": "^5.0.1",
+    "mocha": "^5.2.0",
+    "nyc": "^14.1.1",
     "pem": "^1.7.2",
-    "volos-analytics-memory": "^0.2.0",
-    "volos-quota-memory": "^0.11.0"
+    "supertest": "^3.1.0",
+    "volos-analytics-memory": "^0.2.0"
   }
 }

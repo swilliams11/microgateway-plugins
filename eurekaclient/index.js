@@ -5,15 +5,18 @@
  */
 
 var debug = require('debug')('plugin:eurekeclient');
-var util = require('util');
+//var util = require('util');
 var os = require('os');
 
 const port = process.env.PORT || 8000;
 const Eureka = require('eureka-js-client').Eureka;
 
-module.exports.init = function (config, logger, stats) {
+const CONSOLE_LOG_TAG_COMP = 'microgateway-plugins eurekaclient';
+const LOG_TAG_COMP = 'eurekaclient';
 
-  const lookup = config.servicemap;
+module.exports.init = function (config , logger /*,  stats */) {
+
+  //const lookup = config.servicemap;
   
   config.instance.hostName = os.hostname();
   debug('local hostName: ' + config.instance.hostName);
@@ -28,7 +31,7 @@ module.exports.init = function (config, logger, stats) {
   try {
     client.start();  
   } catch (err) {
-    console.error(err);
+    logger.consoleLog('error',{component: CONSOLE_LOG_TAG_COMP}, err);
     client.stop();
   }
 
@@ -49,7 +52,7 @@ module.exports.init = function (config, logger, stats) {
 
   function getAppName(url) {
     for (var index in config.lookup) {
-      if (url.includes(config.lookup[index].uri) || url == config.lookup[index].uri) {
+      if (url.includes(config.lookup[index].uri) || url === config.lookup[index].uri) {
         return {
                   app: config.lookup[index].app,
                   secure: config.lookup[index].secure
@@ -63,8 +66,8 @@ module.exports.init = function (config, logger, stats) {
     var instances = client.getInstancesByAppId(app);
 
     for (var index in instances) {
-      if (instances[index].status == "UP") {
-        return (secure == true) ? {"hostName": instances[index].hostName, "port": instances[index].securePort["$"]} : {"hostName": instances[index].hostName, "port":instances[index].port["$"]};
+      if (instances[index].status === "UP") {
+        return (secure === true) ? {"hostName": instances[index].hostName, "port": instances[index].securePort["$"]} : {"hostName": instances[index].hostName, "port":instances[index].port["$"]};
       }
     }
     return "";
@@ -87,7 +90,7 @@ module.exports.init = function (config, logger, stats) {
           req.targetSecure = false;
         }        
       } else {
-        console.warn("Target enpoint from Eureka not found");
+        logger.eventLog({level:'warn', req: req, res: res, err:null, component:LOG_TAG_COMP }, "Target endpoint from Eureka not found");
       }
       next();
     }   

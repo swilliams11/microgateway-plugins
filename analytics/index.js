@@ -1,8 +1,8 @@
 'use strict';
 
-var debug = require('debug')('plugin:analytics');
+//var debug = require('debug')('plugin:analytics');
 var volos = require('volos-analytics-apigee');
-module.exports.init = function(config, logger, stats) {
+module.exports.init = function(config, logger /*, stats */) {
 
     config.finalizeRecord = function finalizeRecord(req, res, record, cb) {
         if (res.proxy) {
@@ -10,13 +10,13 @@ module.exports.init = function(config, logger, stats) {
             //can distinguish between healthcheck calls and regular apis calls.
             var proxyPath = req.url.split('?')[0];            
             if (config.proxyPath) {
-                if (config.proxyPath == proxyPath) {
+                if (config.proxyPath === proxyPath) {
                     record.apiproxy = res.proxy.name + "-health";
                     record.apiproxy_revision = res.proxy.revision;
                 }
             } else if (config.relativePath) {
                 var relativePath = "/" + proxyPath.split('/')[2];
-                if (config.relativePath == relativePath) {
+                if (config.relativePath === relativePath) {
                     record.apiproxy = res.proxy.name + "-health";
                     record.apiproxy_revision = res.proxy.revision; 
                 }
@@ -52,7 +52,7 @@ module.exports.init = function(config, logger, stats) {
         try {
             cb(null, record);
         } catch (e) {
-            logger.error("Error encountered processing Apigee analytics.  Allowing request processing to continue", e);
+            logger.eventLog({level:'error', req: req, res: res, err:e, component:'analytics' },"Error encountered processing Apigee analytics.  Allowing request processing to continue");
         }
     };
 
