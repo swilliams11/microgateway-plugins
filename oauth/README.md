@@ -2,7 +2,11 @@
 
 ## Summary
 
+<<<<<<< HEAD
 The `oauth` plugin allows you to secure API requests to Apigee Edge Microgateway with either API keys or OAuth 2.0 tokens. Note that, buy default, when you include this plugin in the plugins sequence, you can use both API Key validation and OAuth 2.0 validation on API requests. However, you can change the default behavior to allow either API key validation **or** OAuth 2.0  validation. 
+=======
+The `oauth` plugin allows you to secure API requests to Apigee Edge Microgateway with either API keys or OAuth 2.0 tokens. Note that, buy default, when you include this plugin in the plugins sequence, you can use both API Key validation and OAuth 2.0 validation on API requests. However, you can change the default behavior to allow either API key validation **or** OAuth 2.0  validation.
+>>>>>>> upstream/master
 
 
 ## When to use this plugin?
@@ -30,7 +34,11 @@ The following steps describe how the plugin operates in an API request flow:
 ## Prerequisites
 
 To use the plugin, you must have installed and configured an instance of Edge Microgateway. You also must have
+<<<<<<< HEAD
 created a product, developer, and developer app on Apigee Edge Cloud. For details, see the following documentation topics: 
+=======
+created a product, developer, and developer app on Apigee Edge Cloud. For details, see the following documentation topics:
+>>>>>>> upstream/master
 
 1. [Install Edge Microgateway](https://docs.apigee.com/api-platform/microgateway/3.0.x/setting-and-configuring-edge-microgateway#Prerequisite)   
 
@@ -48,7 +56,11 @@ oauth:
   # Header name used to send the JWT to Edge Microgateway
   # Default: Authorization: Bearer
 
+<<<<<<< HEAD
   authorization-header: "x-custom-auth-header" 
+=======
+  authorization-header: "x-custom-auth-header"
+>>>>>>> upstream/master
 
   # Header name used to send the API Key to Edge Microgateway
 
@@ -73,25 +85,41 @@ oauth:
   # remove the token from the cache.  
   # Default: 0 seconds
 
+<<<<<<< HEAD
   gracePeriod: 5 
+=======
+  gracePeriod: 5
+>>>>>>> upstream/master
 
   ## Do not set allowOAuthOnly and allowAPIKeyOnly both to true. Only one of them should be set true.
   # Set to true if you want to allow OAuth 2.0 only.  This will disable API Key validation.
   # Default: false, which allows both API Key and OAuth 2.0
 
+<<<<<<< HEAD
   allowOAuthOnly: true 
+=======
+  allowOAuthOnly: true
+>>>>>>> upstream/master
 
   # Set to true if you want to allow OAuth 2.0 only.  This will disable API Key validation.
   # Default: false, which allows both API Key and OAuth 2.0
 
+<<<<<<< HEAD
   allowAPIKeyOnly: true 
+=======
+  allowAPIKeyOnly: true
+>>>>>>> upstream/master
 
   # Set to true to enable Edge Microgateway to check against the resource paths only.
   # In this case it ignores the proxy name check.  
   # Default: false, which enables Edge Microgateway to check if the proxy name is included in the product.
 
 
+<<<<<<< HEAD
   productOnly: true 
+=======
+  productOnly: true
+>>>>>>> upstream/master
 
   ## Note that if you set the tokenCacheSize, then you should also enable it (tokenCache: true)
   # Set tokenCache to true if you want to cache the access token (JWT) that is received after the
@@ -103,7 +131,11 @@ oauth:
   # Set the number of tokens allowed to be cached locally.
   # Default: 100
 
+<<<<<<< HEAD
   tokenCacheSize: 150 
+=======
+  tokenCacheSize: 150
+>>>>>>> upstream/master
 ```
 
 ## Enable the plugin
@@ -138,7 +170,11 @@ If you set `cacheKey` to `true`, then Edge Microgateway will cache the JWT token
 ### Using cache headers
 Edge Microgateway observes the [`cache-control`](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching) header, but in a limited fashion:
   * If a client application wants to cache the JWT that is received after the API Key is validated, then it should set the `cache-control` header to any value except `no-cache`.
+<<<<<<< HEAD
   * If you send this header in the request (`cache-control: max-age=120`), then the JWTs will be cached in Edge Microgateway even if the `cacheKey` is set to `false`. 
+=======
+  * If you send this header in the request (`cache-control: max-age=120`), then the JWTs will be cached in Edge Microgateway even if the `cacheKey` is set to `false`.
+>>>>>>> upstream/master
   * If you set `cacheKey` to `true` and you send a request to Edge Microgateway with `cache-control: no-cache`, the JWT **will** be cached anyway.  
 
 Client applications are not allowed to override the `cacheKey` setting with the `cache-control` header.  This plugin does not allow you to set the cache expiry time in the `cache-control` header; it uses the expiry time in the JWT to determine the TTL of the cache.  
